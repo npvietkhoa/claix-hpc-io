@@ -21,3 +21,17 @@ make bt-full \
        SUBTYPE=full
 ```
 
+# Build Recorder
+```bash
+cmake .. \
+  -DCMAKE_INSTALL_PREFIX=$RECORDER_INSTALL_PATH \
+  -DCMAKE_CXX_COMPILER=$MPICXX \
+  -DCMAKE_PREFIX_PATH=/cvmfs/software.hpc.rwth.de/Linux/RH8/x86_64/intel/sapphirerapids/software/HDF5/1.14.0-iimpi-2022a
+```
+- Remarks:
+    - `RECORDER_INSTALL_PATH=`pwd`/install` in Recorder directory
+    - `$MPICXX` as env. Variable (dynamically assign as env in cluster)
+    - `/cvmfs/software.hpc.rwth.de/Linux/RH8/x86_64/intel/sapphirerapids/software/HDF5/1.14.0-iimpi-2022a` for HDF5 libs
+
+
+
