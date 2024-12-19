@@ -21,6 +21,14 @@ make bt-full \
        SUBTYPE=full
 ```
 
+# Build NPB3.4.3 with suite
+```
+make suite \
+    SFILE=./config/suite.A.def \
+    MPIFC=$MPIFC \
+    MPICC=$MPICC \
+```
+
 # Build Recorder
 ```bash
 cmake .. \
@@ -32,6 +40,5 @@ cmake .. \
     - `RECORDER_INSTALL_PATH=`pwd`/install` in Recorder directory
     - `$MPICXX` as env. Variable (dynamically assign as env in cluster)
     - `/cvmfs/software.hpc.rwth.de/Linux/RH8/x86_64/intel/sapphirerapids/software/HDF5/1.14.0-iimpi-2022a` for HDF5 libs
-
 
 
