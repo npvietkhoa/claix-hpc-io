@@ -41,4 +41,8 @@ cmake .. \
     - `$MPICXX` as env. Variable (dynamically assign as env in cluster)
     - `/cvmfs/software.hpc.rwth.de/Linux/RH8/x86_64/intel/sapphirerapids/software/HDF5/1.14.0-iimpi-2022a` for HDF5 libs
 
-
+# Generate Summary with `pydarshan`
+- Ofc, `pydarshan` is needed
+```
+python -m darshan summary ~/path/to/log_file.darshan
+```
