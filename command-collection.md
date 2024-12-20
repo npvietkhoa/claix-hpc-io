@@ -46,3 +46,7 @@ cmake .. \
 ```
 python -m darshan summary ~/path/to/log_file.darshan
 ```
+- Batch generate for `.darshan` files in current directory
+```
+find . -name "*.darshan" -exec python -m darshan summary {} \;
+```
