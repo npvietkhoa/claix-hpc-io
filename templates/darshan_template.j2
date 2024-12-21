@@ -1,0 +1,15 @@
+#!/usr/bin/zsh
+#SBATCH --job-name=Darshan-{{ binary.replace('.x', '.' ~ ntasks) }}
+#SBATCH --beeond
+#SBATCH --exclusive
+#SBATCH --time=01:59:00
+## Explicit paths should be used for output 
+#SBATCH --output=/hpcwork/ph077533/darshan-logs/{{ binary.replace('.x', '.' ~ ntasks) }}.out
+
+#SBATCH --ntasks={{ ntasks }}
+#SBATCH --nodes=1
+
+export DARSHAN_LOGFILE=$HPCWORK/darshan-results/{{ binary.replace('.x', '.' ~ ntasks) }}.darshan
+export DARSHAN_LOGPATH=$HPCWOR/darshan-results
+cp -r $HPCWORK/NPB3.4.3/NPB3.4-MPI/bin/{{ binary }} $BEEOND
+LD_PRELOAD={{ library_path }} $MPIEXEC $BEEOND/{{ binary.replace('.x', '.' ~ ntasks) }}
