@@ -6,19 +6,25 @@ import subprocess
 from jinja2 import Template
 
 # Define template file mapping
-TEMPLATE_FILES = {
-    "darshan": "./templates/darshan_template.j2",
-    "recorder": "./templates/recorder_template.j2",
-    "scorep": "./templates/scorep_template.j2"
-}
+TEMPLATE_FILES = "./templates/tracing_template.j2"
+
+MODES = ["darshan", "recorder", "scorep"]
 
 # Configurable paths
-BINARY_PATH = "$HPCWORK/NPB3.4.3/NPB3.4-MPI/bin"
+BINARY_PATH = "$HPCWORK/NPB-claix-2023/NPB3.4-MPI/bin"
 LIBRARY_PATHS = {
-    "darshan": "$HPCWORK/Darshan/lib/libdarshan.so",
-    "darshan": "$HPCWORK/Recorder/install/lib/librecorder.so",
+    "darshan": "$HPCWORK/darshan_runtime-claix_2023/lib/libdarshan.so",
+    "recorder": "$HPCWORK/recorder-claix-2023/install/lib/librecorder.so",
     "scorep": None
 }
+OUTPUT_PATH = {
+    "darshan": "$HPCWORK/darshan-results",
+    "recorder": "$HPCWORK/recorder-results",
+    "scorep": "$HPCWORK/scorep-results"
+}
+
+LOG_PATH = "$HPCWORK/beeond-logs"
+
 def load_template(template_file):
     """Load the Slurm template from a file."""
     try:
@@ -43,7 +49,8 @@ def validate_binaries_and_libraries(mode, binaries):
 
     # Validate libraries (if applicable)
     library_path = LIBRARY_PATHS.get(mode)
-    if library_path and not os.path.isfile(library_path):
+    library_path = os.path.expandvars(library_path)
+    if library_path and not (os.path.isfile(library_path) and os.path.islink(library_path)):
         missing_files.append(f"Library not found: {library_path}")
 
     if missing_files:
@@ -55,31 +62,46 @@ def validate_binaries_and_libraries(mode, binaries):
 def main(mode, ntasks_list, binaries):
     """Main function to create and submit jobs."""
     # Load the appropriate template
-    if mode not in TEMPLATE_FILES:
-        print(f"Error: Unsupported mode '{mode}'. Choose from {list(TEMPLATE_FILES.keys())}.")
+    if mode not in MODES:
+        print(f"Error: Unsupported mode '{mode}'.")
         exit(1)
 
-    template_file = TEMPLATE_FILES[mode]
-    slurm_template = load_template(template_file)
+    slurm_template = load_template(TEMPLATE_FILES)
 
     # Validate binaries and libraries
     validate_binaries_and_libraries(mode, binaries)
 
     # Generate combinations of ntasks and binaries
     library_path = LIBRARY_PATHS.get(mode)  # Fetch library path for substitution
-    combinations = itertools.product(ntasks_list, binaries)
 
+    result_path = os.path.expandvars(
+        OUTPUT_PATH.get(mode)
+    ) 
+
+    log_path = os.path.expandvars(LOG_PATH)
+    
+    # Check if log_path exists, if not create it
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+
+    combinations = itertools.product(ntasks_list, binaries)
     # Submit jobs
     for ntasks, binary in combinations:
         # Render the script with ntasks, binary, and paths
-        script_content = slurm_template.render(
-            ntasks=ntasks,
-            binary=binary,
-            binary_path=BINARY_PATH,
-            library_path=library_path
+        binary_path = os.path.join(
+            os.path.expandvars(BINARY_PATH), binary
         )
 
-        # Create a temporary file with delete=True
+        script_content = slurm_template.render(
+            mode=mode,
+            ntasks=ntasks,
+            binary=binary,
+            binary_path=binary_path,
+            library_path=library_path,
+            log_path=log_path,
+            result_path=result_path,
+        )
+
         with tempfile.NamedTemporaryFile(mode='w', suffix='.sh', delete=True) as temp_file:
             temp_file.write(script_content)
             temp_file.flush()  # Ensure content is written to disk
@@ -99,7 +121,7 @@ if __name__ == "__main__":
         "--mode",
         type=str,
         required=True,
-        help="Mode of operation: 'Darshan', 'Recorder', or 'ScoreP'"
+        help="Mode of operation: 'darshan', 'recorder', or 'scorep'"
     )
     parser.add_argument(
         "--ntasks_list",
