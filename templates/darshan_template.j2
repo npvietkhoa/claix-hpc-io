@@ -1,15 +1,25 @@
 #!/usr/bin/zsh
-#SBATCH --job-name=Darshan-{{ binary.replace('.x', '.' ~ ntasks) }}
+#SBATCH --job-name=darshan-{{ binary.replace('.x', '.' ~ ntasks) }}
 #SBATCH --beeond
 #SBATCH --exclusive
 #SBATCH --time=01:59:00
 ## Explicit paths should be used for output 
-#SBATCH --output=/hpcwork/ph077533/darshan-logs/{{ binary.replace('.x', '.' ~ ntasks) }}.out
+#SBATCH --output=/hpcwork/ph077533/beeond-logs/{{ binary.replace('.x', '.' ~ ntasks) }}.out
 
 #SBATCH --ntasks={{ ntasks }}
 #SBATCH --nodes=1
 
-export DARSHAN_LOGFILE=$HPCWORK/darshan-results/{{ binary.replace('.x', '.' ~ ntasks) }}.darshan
-export DARSHAN_LOGPATH=$HPCWOR/darshan-results
-cp -r $HPCWORK/NPB3.4.3/NPB3.4-MPI/bin/{{ binary }} $BEEOND
+ml purge
+ml load iimpi
+ml load HDF5
+
+# Make sure the output directory exists
+[ ! -d $HPCWORK/beeond-logs ] && mkdir -p $HPCWORK/beeond-logs
+[ ! -d $HPCWORK/darshan-results ] && mkdir -p $HPCWORK/darshan-results 
+
+# Copy the binary to the BeeOND filesystem
+cp {{ binary_path }} $BEEOND
+
+# Rename the binary to include the number of tasks
+mv $BEEOND/{{ binary_name }} $BEEOND/{{ binary_name.replace('.x', '.' ~ ntasks) }}
 LD_PRELOAD={{ library_path }} $MPIEXEC $BEEOND/{{ binary.replace('.x', '.' ~ ntasks) }}
