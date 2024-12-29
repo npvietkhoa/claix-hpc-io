@@ -49,9 +49,10 @@ def validate_binaries_and_libraries(mode, binaries):
 
     # Validate libraries (if applicable)
     library_path = LIBRARY_PATHS.get(mode)
-    library_path = os.path.expandvars(library_path)
-    if library_path and not (os.path.isfile(library_path) and os.path.islink(library_path)):
-        missing_files.append(f"Library not found: {library_path}")
+    if library_path:
+        library_path = os.path.expandvars(library_path)
+        if not (os.path.isfile(library_path) and os.path.islink(library_path)):
+            missing_files.append(f"Library not found: {library_path}")
 
     if missing_files:
         print("Validation failed for the following files:")
@@ -76,7 +77,11 @@ def main(mode, ntasks_list, binaries):
 
     result_path = os.path.expandvars(
         OUTPUT_PATH.get(mode)
-    ) 
+    )
+
+    # Check if result_path exists, if not create it
+    if not os.path.exists(result_path):
+        os.makedirs(result_path)
 
     log_path = os.path.expandvars(LOG_PATH)
     
