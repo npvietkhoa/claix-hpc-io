@@ -1,0 +1,56 @@
+Bootstrap: docker
+From: python:3.12-slim
+
+%help
+    This container runs Jupyter Notebook with essential data analysis tools.
+
+%labels
+    Author "Khoa Nguyen"
+    Version "1.0"
+    Description "Apptainer container for running Jupyter Notebook with analysis tools."
+
+%post
+    echo "Updating and installing minimal dependencies..."
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libatlas-base-dev \
+        libopenblas-dev \
+        liblapack-dev \
+        libffi-dev \
+        libhdf5-dev \
+        && rm -rf /var/lib/apt/lists/*
+
+    echo "Copying requirements.txt into container..."
+    cp /srv/requirements.txt /tmp/requirements.txt
+
+    echo "Installing Python packages from requirements.txt..."
+    pip install --no-cache-dir --upgrade pip
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+    echo "Creating Jupyter Notebook configuration..."
+    mkdir -p /root/.jupyter
+    echo "c.NotebookApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_notebook_config.py
+    echo "c.NotebookApp.allow_root = True" >> /root/.jupyter/jupyter_notebook_config.py
+    echo "c.NotebookApp.open_browser = False" >> /root/.jupyter/jupyter_notebook_config.py
+
+%environment
+    export PATH="/usr/local/bin:$PATH"
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+
+%runscript
+    echo "Starting Jupyter Notebook..."
+    exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root
+
+%startscript
+    echo "Starting Jupyter Notebook as a service..."
+    exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root
+
+%files
+    requirements.txt /srv/requirements.txt
+
+%apprun notebook 
+    exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root
+
+%post
+    mkdir -p /workspace
