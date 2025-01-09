@@ -2,7 +2,7 @@ Bootstrap: docker
 From: python:3.12-slim
 
 %help
-    This container runs Jupyter Notebook with essential data analysis tools.
+    This container runs Jupyter Notebook with essential data analysis tools on claix cluster.
 
 %labels
     Author "Khoa Nguyen"
@@ -33,6 +33,11 @@ From: python:3.12-slim
     echo "c.NotebookApp.allow_root = True" >> /root/.jupyter/jupyter_notebook_config.py
     echo "c.NotebookApp.open_browser = False" >> /root/.jupyter/jupyter_notebook_config.py
 
+    mkdir -p /workspace
+
+%files
+    requirements.txt /srv/requirements.txt
+
 %environment
     export PATH="/usr/local/bin:$PATH"
     export LC_ALL=C.UTF-8
@@ -46,11 +51,5 @@ From: python:3.12-slim
     echo "Starting Jupyter Notebook as a service..."
     exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root
 
-%files
-    requirements.txt /srv/requirements.txt
-
 %apprun notebook 
     exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root
-
-%post
-    mkdir -p /workspace
