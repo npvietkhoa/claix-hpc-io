@@ -15,23 +15,23 @@ ml load iimpi
 ml load HDF5
 
 # Set the environment variables for tracing
-{%- if mode == 'recorder' -%}
+{% if mode == 'recorder' %}
 export RECORDER_POSIX_TRACING=1
 export RECORDER_MPIIO_TRACING=1
 export RECORDER_MPI_TRACING=1
 export RECORDER_HDF5_TRACING=1
 export RECORDER_TRACES_DIR={{ result_path }}/{{ binary.replace('.x', '.' ~ ntasks) }}
-{%- endif -%}
+{% endif %}
 
-{%- if mode == 'darshan' -%}
+{% if mode == 'darshan' %}
 export DARSHAN_LOGPATH={{ result_path }}
-{%- endif -%}
+{% endif %}
 
-{%- if mode == 'scorep' -%}
+{% if mode == 'scorep' %}
 export SCOREP_TIMER=clock_gettime
 export SCOREP_EXPERIMENT_DIRECTORY={{ result_path }}/{{ binary.replace('.x', '.' ~ ntasks) }}
 export SCOREP_ENABLE_TRACING=yes
-{%- endif -%}
+{% endif %}
 
 # Copy the binary to the BeeOND filesystem
 cp {{ binary_path }} $BEEOND
@@ -41,9 +41,9 @@ cp {{ binary_path }} $BEEOND
 mv $BEEOND/{{ binary }} $BEEOND/{{ binary.replace('.x', '.' ~ ntasks) }}
 
 # Rename the binary to include the number of tasks
-{%- if library_path -%}
+{% if library_path %}
 LD_PRELOAD={{ library_path }} $MPIEXEC $BEEOND/{{ binary.replace('.x', '.' ~ ntasks) }}
 {% else %}
 $MPIEXEC $BEEOND/{{ binary.replace('.x', '.' ~ ntasks) }}
-{%- endif -%}
+{% endif %}
 
