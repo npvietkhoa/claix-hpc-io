@@ -48,11 +48,12 @@ def validate_binaries_and_libraries(mode, binaries):
             missing_files.append(f"Binary not found: {binary_path}")
 
     # Validate libraries (if applicable)
-    library_path = LIBRARY_PATHS.get(mode)
-    if library_path:
-        library_path = os.path.expandvars(library_path)
-        if not (os.path.isfile(library_path) and os.path.islink(library_path)):
-            missing_files.append(f"Library not found: {library_path}")
+    if mode and mode in LIBRARY_PATHS:
+        library_path = LIBRARY_PATHS.get(mode)
+        if library_path:
+            library_path = os.path.expandvars(library_path)
+            if not (os.path.isfile(library_path) and os.path.islink(library_path)):
+                missing_files.append(f"Library not found: {library_path}")
 
     if missing_files:
         print("Validation failed for the following files:")
@@ -63,24 +64,20 @@ def validate_binaries_and_libraries(mode, binaries):
 def main(mode, ntasks_list, binaries):
     """Main function to create and submit jobs."""
     # Load the appropriate template
-    if mode not in MODES:
-        print(f"Error: Unsupported mode '{mode}'.")
-        exit(1)
-
     slurm_template = load_template(TEMPLATE_FILES)
 
     # Validate binaries and libraries
     validate_binaries_and_libraries(mode, binaries)
 
     # Generate combinations of ntasks and binaries
-    library_path = LIBRARY_PATHS.get(mode)  # Fetch library path for substitution
+    library_path = LIBRARY_PATHS.get(mode) if mode else None  # Fetch library path for substitution
 
     result_path = os.path.expandvars(
         OUTPUT_PATH.get(mode)
-    )
+    ) if mode else None
 
     # Check if result_path exists, if not create it
-    if not os.path.exists(result_path):
+    if result_path and not os.path.exists(result_path):
         os.makedirs(result_path)
 
     log_path = os.path.expandvars(LOG_PATH)
@@ -125,8 +122,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mode",
         type=str,
-        required=True,
-        help="Mode of operation: 'darshan', 'recorder', or 'scorep'"
+        help="Mode of operation: 'darshan', 'recorder', 'scorep' or none",
     )
     parser.add_argument(
         "--ntasks_list",
