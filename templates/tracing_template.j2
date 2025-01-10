@@ -25,12 +25,12 @@ export RECORDER_TRACES_DIR={{ result_path }}/{{ binary.replace('.x', '.' ~ ntask
 
 {% if mode == 'darshan' %}
 export DARSHAN_LOGPATH={{ result_path }}
+export DXT_ENABLE_IO_TRACE=1
 {% endif %}
 
 {% if mode == 'scorep' %}
-export SCOREP_TIMER=clock_gettime
 export SCOREP_EXPERIMENT_DIRECTORY={{ result_path }}/{{ binary.replace('.x', '.' ~ ntasks) }}
-export SCOREP_ENABLE_TRACING=yes
+export SCOREP_ENABLE_TRACING=true
 {% endif %}
 
 # Copy the binary to the BeeOND filesystem
