@@ -1,0 +1,9 @@
+# Environment
+venv/
+.venv/
+
+# (probably) data file for running benchmark binaries 
+btio.full.out
+
+# binary file of apptainer
+*.sif
