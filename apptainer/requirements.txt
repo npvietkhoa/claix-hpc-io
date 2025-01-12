@@ -29,3 +29,4 @@ tornado
 tzdata
 wcwidth
 xyzservices
+otf2
