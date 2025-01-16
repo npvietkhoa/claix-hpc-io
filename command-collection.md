@@ -51,3 +51,7 @@ for dir in */; do
     fi
 done
 ```
+# Regex for consistent File Name
+```
+bt.[A,B,C].\d{1,2}(.mpi_io_full)?
+```
