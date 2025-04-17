@@ -7,3 +7,7 @@ btio.full.out
 
 # binary file of apptainer
 *.sif
+
+# log of cluster
+*.log
+core.*
