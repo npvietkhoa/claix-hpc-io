@@ -11,3 +11,15 @@ btio.full.out
 # log of cluster
 *.log
 core.*
+*.out
+
+# data file of simulation
+*.dat
+
+# Ignore common C build artifacts
+*.out
+a.out
+*.exe
+*.elf
+scorep_mpi_io_sim
+mpi_io_sim
