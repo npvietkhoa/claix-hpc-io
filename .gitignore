@@ -21,5 +21,5 @@ core.*
 a.out
 *.exe
 *.elf
-scorep_mpi_io_sim
 mpi_io_sim
+scorep_mpi_io_sim
