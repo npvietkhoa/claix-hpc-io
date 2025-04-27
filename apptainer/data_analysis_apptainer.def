@@ -6,13 +6,14 @@ From: python:3.12-slim
 
 %labels
     Author "Khoa Nguyen"
-    Version "1.0"
-    Description "Apptainer container for running Jupyter Notebook with analysis tools."
+    Version "1.1"
+    Description "Apptainer container for running Jupyter Notebook with analysis tools, including recorder-viz."
 
 %post
     echo "Updating and installing minimal dependencies..."
     apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
+        git \
         libatlas-base-dev \
         libopenblas-dev \
         liblapack-dev \
@@ -26,6 +27,9 @@ From: python:3.12-slim
     echo "Installing Python packages from requirements.txt..."
     pip install --no-cache-dir --upgrade pip
     pip install --no-cache-dir -r /tmp/requirements.txt
+
+    echo "Installing recorder-viz from GitHub..."
+    pip install --no-cache-dir git+https://github.com/wangvsa/recorder-viz.git
 
     echo "Creating Jupyter Notebook configuration..."
     mkdir -p /root/.jupyter
@@ -51,5 +55,5 @@ From: python:3.12-slim
     echo "Starting Jupyter Notebook as a service..."
     exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root
 
-%apprun notebook 
+%apprun notebook
     exec jupyter notebook --notebook-dir=/workspace --port=8888 --no-browser --allow-root

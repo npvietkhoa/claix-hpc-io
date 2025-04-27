@@ -22,7 +22,6 @@ pycparser
 pyparsing
 python-dateutil
 pytz
-recorder-viz
 seaborn
 six
 tornado
