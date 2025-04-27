@@ -15,7 +15,7 @@ $(BIN): $(SRC)
 	$(MPICC) $(CFLAGS) -o $@ $^
 
 $(BIN_S): $(SRC)
-	scorep $(MPICC) $(CFLAGS) -o $@ $^
+	scorep --io=runtime:posix $(MPICC) $(CFLAGS) -o $@ $^
 
 clean:
 	rm -f $(BIN) $(BIN_S)
